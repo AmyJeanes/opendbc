@@ -12,3 +12,8 @@ class TeslaFlagsSP(IntFlag):
     Flags for Tesla specific quirks within sunnypilot.
   """
   COOP_STEERING = 1
+  HAS_VEHICLE_BUS = 2  # 3-finger infotainment press signal is present on the VEHICLE bus with the deprecated Tesla harness installed
+
+
+class TeslaSafetyFlagsSP:
+  HAS_VEHICLE_BUS = 1
