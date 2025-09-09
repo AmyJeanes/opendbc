@@ -310,7 +310,9 @@ bool steer_angle_cmd_checks_vm(int desired_angle, bool steer_control_enabled, co
   bool violation = false;
 
   if (is_lat_active() && steer_control_enabled) {
+    print("\n");
     print("[COOP STEERING] steer_angle_cmd_checks_vm: steer_control_enabled is true and is_lat_active is true");
+    print("\n");
     // *** ISO lateral jerk limit ***
     // calculate maximum angle rate per second
     const float max_curvature_rate_sec = MAX_LATERAL_JERK / (fudged_speed * fudged_speed);
@@ -340,7 +342,9 @@ bool steer_angle_cmd_checks_vm(int desired_angle, bool steer_control_enabled, co
 
   // Angle should either be 0 or same as current angle while not steering
   if (!steer_control_enabled) {
+    print("\n");
     print("[COOP STEERING] steer_angle_cmd_checks_vm: steer_control_enabled is false");
+    print("\n");
     const int max_inactive_angle = CLAMP(angle_meas.max, -limits.max_angle, limits.max_angle) + 1;
     const int min_inactive_angle = CLAMP(angle_meas.min, -limits.max_angle, limits.max_angle) - 1;
     violation |= max_limit_check(desired_angle, max_inactive_angle, min_inactive_angle);
@@ -349,7 +353,9 @@ bool steer_angle_cmd_checks_vm(int desired_angle, bool steer_control_enabled, co
   // No angle control allowed when controls are not allowed
   if (!is_lat_active()) {
     if(steer_control_enabled){
+      print("\n");
       print("[COOP STEERING] steer_angle_cmd_checks_vm violation: controls not allowed but steer enabled");
+      print("\n");
     }
     violation |= steer_control_enabled;
   }
@@ -360,9 +366,13 @@ bool steer_angle_cmd_checks_vm(int desired_angle, bool steer_control_enabled, co
   }
 
   if (violation) {
+    print("\n");
     print("[COOP STEERING] steer_angle_cmd_checks_vm violation");
+    print("\n");
   } else {
+    print("\n");
     print("[COOP STEERING] steer_angle_cmd_checks_vm no violation");
+    print("\n");
   }
 
   return violation;

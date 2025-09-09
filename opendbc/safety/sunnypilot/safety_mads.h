@@ -168,18 +168,28 @@ inline void mads_exit_controls(const DisengageReason reason) {
     m_mads_state.current_disengage.active_reason = reason;
     m_mads_state.controls_requested_lat = false;
     m_mads_state.controls_allowed_lat = false;
+    print("\n");
+    print("[COOP STEERING] mads_exit_controls: ");
+    print(reason);
+    print("\n");
   }
 }
 
 inline bool mads_is_lateral_control_allowed_by_mads(void) {
   if(m_mads_state.system_enabled) {
     if(m_mads_state.controls_allowed_lat){
+      print("\n");
       print("[COOP STEERING] mads_is_lateral_control_allowed_by_mads: true");
+      print("\n");
     } else{
+      print("\n");
       print("[COOP STEERING] mads_is_lateral_control_allowed_by_mads: false");
+      print("\n");
     }
   } else {
+    print("\n");
     print("[COOP STEERING] mads_is_lateral_control_allowed_by_mads: false, system not enabled");
+    print("\n");
   }
   return m_mads_state.system_enabled && m_mads_state.controls_allowed_lat;
 }
