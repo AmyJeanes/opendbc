@@ -75,7 +75,7 @@ inline void m_update_binary_state(BinaryStateTracking *state) {
 
 /**
  * @brief Updates the MADS control state based on current system conditions
- * 
+ *
  * @return void
  */
 inline void m_update_control_state(void) {
@@ -172,6 +172,15 @@ inline void mads_exit_controls(const DisengageReason reason) {
 }
 
 inline bool mads_is_lateral_control_allowed_by_mads(void) {
+  if(m_mads_state.system_enabled) {
+    if(m_mads_state.controls_allowed_lat){
+      print("[COOP STEERING] mads_is_lateral_control_allowed_by_mads: true");
+    } else{
+      print("[COOP STEERING] mads_is_lateral_control_allowed_by_mads: false");
+    }
+  } else {
+    print("[COOP STEERING] mads_is_lateral_control_allowed_by_mads: false, system not enabled");
+  }
   return m_mads_state.system_enabled && m_mads_state.controls_allowed_lat;
 }
 
