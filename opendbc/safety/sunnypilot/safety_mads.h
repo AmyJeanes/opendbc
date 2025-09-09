@@ -220,7 +220,6 @@ inline void mads_exit_controls(const DisengageReason reason) {
     default:
       break;
     }
-    print(reason);
     print("\n");
   }
 }
