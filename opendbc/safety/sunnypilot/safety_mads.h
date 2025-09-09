@@ -86,22 +86,34 @@ inline void m_update_control_state(void) {
       (m_mads_state.mads_button.transition == MADS_EDGE_RISING) ||
       (m_mads_state.op_controls_allowed.transition == MADS_EDGE_RISING)) {
     m_mads_state.controls_requested_lat = true;
+    print("\n");
+    print("[COOP STEERING] m_update_control_state: lat controls requested");
+    print("\n");
   }
 
   // Primary control blockers - these prevent any further control processing
   if (m_mads_state.acc_main.transition == MADS_EDGE_FALLING) {
     mads_exit_controls(MADS_DISENGAGE_REASON_ACC_MAIN_OFF);
     allowed = false;  // No matter what, no further control processing on this cycle
+    print("\n");
+    print("[COOP STEERING] m_update_control_state: ACC turned off, disenging lat control");
+    print("\n");
   }
 
   if (m_mads_state.mads_steering_disengage.transition == MADS_EDGE_RISING) {
     mads_exit_controls(MADS_DISENGAGE_REASON_STEERING_DISENGAGE);
     allowed = false;  // No matter what, no further control processing on this cycle
+    print("\n");
+    print("[COOP STEERING] m_update_control_state: steering disengage detected, disenging lat control");
+    print("\n");
   }
 
   if (m_mads_state.disengage_lateral_on_brake && (m_mads_state.braking.transition == MADS_EDGE_RISING)) {
     mads_exit_controls(MADS_DISENGAGE_REASON_BRAKE);
     allowed = false;
+    print("\n");
+    print("[COOP STEERING] m_update_control_state: brake is pressed, disengaging lat control");
+    print("\n");
   }
 
   // Secondary control conditions - only checked if primary conditions don't block further control processing
@@ -111,12 +123,18 @@ inline void m_update_control_state(void) {
     if (m_mads_state.braking.transition == MADS_EDGE_RISING) {
       mads_exit_controls(MADS_DISENGAGE_REASON_BRAKE);
       allowed = false;
+      print("\n");
+      print("[COOP STEERING] m_update_control_state: brake is pressed, pausing lat control");
+      print("\n");
     } else if ((m_mads_state.braking.transition == MADS_EDGE_FALLING) &&
                (m_mads_state.current_disengage.active_reason == MADS_DISENGAGE_REASON_BRAKE) &&
                (m_mads_state.current_disengage.pending_reasons == MADS_DISENGAGE_REASON_BRAKE)) {
       m_mads_state.controls_requested_lat = true;
     } else if (m_mads_state.braking.current) {
       allowed = false;
+      print("\n");
+      print("[COOP STEERING] m_update_control_state: brake is pressed, pausing lat control");
+      print("\n");
     } else {
     }
   }
@@ -125,6 +143,9 @@ inline void m_update_control_state(void) {
   if (allowed && m_mads_state.controls_requested_lat && !m_mads_state.controls_allowed_lat) {
     m_mads_state.controls_requested_lat = false;
     m_mads_state.controls_allowed_lat = true;
+    print("\n");
+    print("[COOP STEERING] m_update_control_state: lat controls allowed");
+    print("\n");
     m_mads_state.current_disengage.active_reason = MADS_DISENGAGE_REASON_NONE;
     m_mads_state.current_disengage.pending_reasons = MADS_DISENGAGE_REASON_NONE;
   }
@@ -170,6 +191,35 @@ inline void mads_exit_controls(const DisengageReason reason) {
     m_mads_state.controls_allowed_lat = false;
     print("\n");
     print("[COOP STEERING] mads_exit_controls: ");
+    switch (reason)
+    {
+    case MADS_DISENGAGE_REASON_BRAKE:
+      print("[COOP STEERING] mads_exit_controls: brake disengaged");
+      break;
+    case MADS_DISENGAGE_REASON_LAG:
+      print("[COOP STEERING] mads_exit_controls: system lag disengaged");
+      break;
+    case MADS_DISENGAGE_REASON_BUTTON:
+      print("[COOP STEERING] mads_exit_controls: button disengaged");
+      break;
+    case MADS_DISENGAGE_REASON_ACC_MAIN_OFF:
+      print("[COOP STEERING] mads_exit_controls: ACC off disengaged");
+      break;
+    case MADS_DISENGAGE_REASON_NON_PCM_ACC_MAIN_DESYNC:
+      print("[COOP STEERING] mads_exit_controls: ACC desync disengaged");
+      break;
+    case MADS_DISENGAGE_REASON_HEARTBEAT_ENGAGED_MISMATCH:
+      print("[COOP STEERING] mads_exit_controls: heartbeat mismatch disengaged");
+      break;
+    case MADS_DISENGAGE_REASON_STEERING_DISENGAGE:
+      print("[COOP STEERING] mads_exit_controls: steering disengage disengaged");
+      break;
+    case MADS_DISENGAGE_REASON_NONE:
+      print("[COOP STEERING] mads_exit_controls: none disengaged");
+      break;
+    default:
+      break;
+    }
     print(reason);
     print("\n");
   }
