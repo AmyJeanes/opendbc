@@ -20,7 +20,7 @@ class CoopSteeringCarController:
 
   @staticmethod
   def coop_steering_status_update(CC: structs.CarControl, CC_SP: structs.CarControlSP) -> CoopSteeringDataSP:
-    coop_steering = get_param(CC_SP.params, "TeslaCoopSteering", "0")
+    coop_steering = get_param(CC_SP.params, "TeslaCoopSteering", False)
     control_type = 2 if coop_steering else 1
 
     return CoopSteeringDataSP(control_type)
