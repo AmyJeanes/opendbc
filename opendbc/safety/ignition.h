@@ -7,6 +7,8 @@
 
 bool ignition_can = false;
 uint32_t ignition_can_cnt = 0U;
+bool wake_on_can = false;
+uint32_t wake_on_can_cnt = 0U;
 
 void ignition_can_hook(const CANPacket_t *msg) {
   if (msg->bus == 0U) {
@@ -44,6 +46,10 @@ void ignition_can_hook(const CANPacket_t *msg) {
         int power_state = (msg->data[0] >> 5U) & 0x3U;
         ignition_can = power_state == 0x3;  // VEHICLE_POWER_STATE_DRIVE=3
         ignition_can_cnt = 0U;
+        // Also bootkick the device on any non-OFF LV power state (e.g. Tesla
+        // app wake / preconditioning), so sunnypilot is loaded before driving
+        wake_on_can = power_state != 0x0;  // not VEHICLE_POWER_STATE_OFF
+        wake_on_can_cnt = 0U;
       }
       prev_counter_tesla = counter;
     }
