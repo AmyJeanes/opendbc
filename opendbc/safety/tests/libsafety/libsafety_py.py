@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -23,6 +24,8 @@ def _build_libsafety(release: bool = False) -> str:
   ldflags = [
     '-fsanitize=undefined', '-fno-sanitize-recover=undefined',
   ]
+  if sys.platform == 'win32':
+    cflags += ['-mno-ms-bitfields']  # mingw's MS layout would put CANPacket_t's checksum at byte 8 instead of 5
   if not release:
     cflags += ['-DALLOW_DEBUG', '-fprofile-arcs', '-ftest-coverage']
     ldflags += ['-fprofile-arcs', '-ftest-coverage']
@@ -44,9 +47,10 @@ typedef struct {
   unsigned char fd : 1;
   unsigned char bus : 3;
   unsigned char data_len_code : 4;
-  unsigned char rejected : 1;
-  unsigned char returned : 1;
-  unsigned char extended : 1;
+  // unsigned int so cffi's MSVC bitfield rules on Windows also pack these into the firmware's layout (checksum at byte 5)
+  unsigned int rejected : 1;
+  unsigned int returned : 1;
+  unsigned int extended : 1;
   unsigned int addr : 29;
   unsigned char checksum;
   unsigned char data[64];
