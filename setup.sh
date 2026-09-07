@@ -18,12 +18,9 @@ if ! command -v uv &>/dev/null; then
 fi
 
 export UV_PROJECT_ENVIRONMENT="$BASEDIR/.venv"
-SYNC_ARGS=()
 VENV_BIN=bin
 if [[ "$(uname -s)" == MINGW* || "$(uname -s)" == MSYS* ]]; then
-  # MSYS2 shell with a native Python: the venv keeps its scripts in Scripts/, and cppcheck has no Windows build yet
-  SYNC_ARGS=(--no-install-package cppcheck)
-  VENV_BIN=Scripts
+  VENV_BIN=Scripts  # MSYS2 shell with a native Python: the venv keeps its scripts in Scripts/
 fi
-uv sync --all-extras --all-groups --inexact "${SYNC_ARGS[@]}"
+uv sync --all-extras --all-groups --inexact
 source "$PYTHONPATH/.venv/$VENV_BIN/activate"
