@@ -18,5 +18,13 @@ if ! command -v uv &>/dev/null; then
 fi
 
 export UV_PROJECT_ENVIRONMENT="$BASEDIR/.venv"
-uv sync --all-extras --all-groups --inexact
-source "$PYTHONPATH/.venv/bin/activate"
+SYNC_ARGS=()
+VENV_BIN=bin
+if [[ "$(uname -s)" == MINGW* || "$(uname -s)" == MSYS* ]]; then
+  # MSYS2 shell with a native Python: the venv keeps its scripts in Scripts/
+  # TODO: drop the exclusion once comma-deps-cppcheck has a win_amd64 wheel on PyPI; the release-cppcheck shim cannot install on Windows
+  SYNC_ARGS=(--no-install-package cppcheck)
+  VENV_BIN=Scripts
+fi
+uv sync --all-extras --all-groups --inexact "${SYNC_ARGS[@]}"
+source "$PYTHONPATH/.venv/$VENV_BIN/activate"
