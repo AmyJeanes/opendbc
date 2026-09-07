@@ -18,5 +18,9 @@ if ! command -v uv &>/dev/null; then
 fi
 
 export UV_PROJECT_ENVIRONMENT="$BASEDIR/.venv"
+VENV_BIN=bin
+if [[ "$(uname -s)" == MINGW* || "$(uname -s)" == MSYS* ]]; then
+  VENV_BIN=Scripts  # MSYS2 shell with a native Python: the venv keeps its scripts in Scripts/
+fi
 uv sync --all-extras --all-groups --inexact
-source "$PYTHONPATH/.venv/bin/activate"
+source "$PYTHONPATH/.venv/$VENV_BIN/activate"

@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: ./test.sh
+    name: ./test.sh (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -16,11 +16,25 @@ jobs:
         include:
           - os: ${{ github.repository == 'commaai/opendbc' && 'namespace-profile-amd64-8x16' || 'ubuntu-24.04' }}
           - os: ${{ github.repository == 'commaai/opendbc' && 'namespace-profile-macos-8x14' || 'macos-latest' }}
+          - os: windows-latest
+            shell: msys2 {0}
+            timeout: 180  # a 4-core GitHub-hosted runner: the unit tests alone take most of a minute there
+    defaults:
+      run:
+        shell: ${{ matrix.shell || 'bash -e {0}' }}
     steps:
     - uses: actions/checkout@v4
+    - uses: msys2/setup-msys2@v2
+      if: runner.os == 'Windows'
+      with:
+        msystem: CLANG64
+        path-type: inherit  # uv and Git for Windows stay visible
+        install: mingw-w64-clang-x86_64-clang  # cc for libsafety
+    - uses: astral-sh/setup-uv@v5
+      if: runner.os == 'Windows'
     - uses: commaai/timeout@v1
       with:
-        timeout: ${{ github.repository == 'commaai/opendbc' && '90' || '999' }}
+        timeout: ${{ matrix.timeout || (github.repository == 'commaai/opendbc' && '90' || '999') }}
     - run: ./test.sh
 
   safety_tests:
